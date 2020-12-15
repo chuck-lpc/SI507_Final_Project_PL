@@ -218,9 +218,10 @@ def get_soup_with_cache(url):
     return soup
 
 
-def get_game_instance(appid):
+def get_game_instance(appid, region='us'):
     print(appid)
-    game_url = 'https://store.steampowered.com/app/'+str(appid)
+    game_url = 'https://store.steampowered.com/app/'+str(appid)+'/?cc=us'
+    game_url = f'https://store.steampowered.com/app/{str(appid)}/?cc={region}'
     soup = get_soup_with_cache(game_url)
     
     name = soup.find('div', class_ = 'apphub_AppName').text.strip()
@@ -242,7 +243,7 @@ def get_game_instance(appid):
     return ret
 
 
-def get_games_for_user(steamid):
+def get_games_for_user(steamid, region='us'):
     steam_baseurl = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/"
     steam_format_data = 'json'
     steam_key = secrets.steam_key
@@ -256,9 +257,9 @@ def get_games_for_user(steamid):
         for each in steam_data['response']['games']:
             appid = each['appid']
             try:
-                game_instance = get_game_instance(appid)
+                game_instance = get_game_instance(appid, region)
             except:
-                print("Unknown appid: {}".format(appid))
+                print(f"Unknown appid: {appid} in {region}")
                 continue
             ret.append(game_instance)
     else:
@@ -308,11 +309,12 @@ if __name__ == "__main__":
     #steam_key = '7F374A23BA3BD0391B8860562E98B9B9'
     steamid = '76561198439501171'
 #    steamid = '76561198369094342'
+    region = 'us'
  
     #steam_format_data = 'json'
 
     #steam_data = make_request_with_cache_steam(steam_baseurl, steam_key, steamid, steam_format_data)
-    games = get_games_for_user(steamid)
+    games = get_games_for_user(steamid, region)
 
     save_games_to_db(games)
 
