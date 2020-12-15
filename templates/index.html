@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF8"/>
+    <title>Steam Account Analyzer</title>
+    <style>
+        .signature {
+            color: blue;
+            font-style: italic;
+        }
+
+        .contact {
+            color: black;
+            font-size: small;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to the Steam Account Analyzer!</h1>
+    <p class="signature">
+        Made by Pengchao Liang, for SI507 F20.
+    </p>
+    <p class="contact">
+        contact: pengchal@umich.edu
+    </p>
+    <form action='/results' method='POST'>
+    <p>
+        Please enter your steam ID here <input name="steamid" type="text"/><br/>
+    </p>
+    <p>
+        In what currency you would like to see the total value?
+        <select name="currency">
+            <option value="USD">USD</option>
+            <option value="CNY">CNY</option>
+            <option value="EUR">EUR</option>
+            <option value="JPY">JPY</option>
+            <option value="GBP">GBP</option>
+            <option value="INR">INR</option>
+            <option value="MXN">MXN</option>
+            <option value="PLN">PLN</option>
+            <option value="AUD">AUD</option>
+            <option value="CAD">CAD</option>
+        </select>
+    </p>
+    <p>
+        Order the list by: </br>
+        <input type="radio" name="order" value="appid" checked>App ID<br/>
+        <input type="radio" name="order" value="name">Name<br/>
+        <input type="radio" name="order" value="price">Price<br/>
+    </p>
+    <input type='submit' value='Get Value'/>
+    </form>
+</body>
+</html>

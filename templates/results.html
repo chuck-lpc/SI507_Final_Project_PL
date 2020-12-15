@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF8"/>
+    <title>Steam Account Analyzer: Results</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+        .signature {
+            color: blue;
+            font-style: italic;
+        }
+
+        .contact {
+            color: black;
+            font-size: small;
+        }
+    </style>
+</head>
+<body>
+    <h1>Here are your results!</h1>
+    <p>
+        The total estimated value of your account (Steam ID: {{steamid}}) is:</br>
+        {{origin_value}} in {{origin_currency}}, {{converted_value}} in {{currency_to_convert}}.
+
+    </p>
+    <table>
+        <tr>
+            <th>App ID</th>
+            <th>App Name</th>
+            <th>Price</th>
+            <th>Currency</th>
+        </tr>
+        {% for row in games %}
+        <tr>
+            <td>{{row.appid}}</td>
+            <td><a href='https://store.steampowered.com/app/{{row.appid}}'>{{row.name}}</a></td>
+            <td>{{row.price}}</td>
+            <td>{{row.currency}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    </br></br>
+    Return <a href='/'>home</a>.
+    <p class="signature">
+        Made by Pengchao Liang, for SI507 F20.
+    </p>
+    <p class="contact">
+        contact: pengchal@umich.edu
+    </p>
+</body>
+</html>

@@ -3,6 +3,7 @@ import json
 import requests
 import sqlite3
 from bs4 import BeautifulSoup
+import secrets
 
 CACHE_FILENAME = "steam_owned_apps_cache.json"
 CACHE_DICT = {}
@@ -242,51 +243,89 @@ def get_game_instance(appid):
 
 
 def get_games_for_user(steamid):
-    steam_data = make_request_with_cache_steam(steam_baseurl, steam_key, steamid, steam_format_data)
+    steam_baseurl = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/"
+    steam_format_data = 'json'
+    steam_key = secrets.steam_key
+    try:
+        steam_data = make_request_with_cache_steam(steam_baseurl, steam_key, steamid, steam_format_data)
+    except:
+        print('Steam data request failed')
+        steam_data = []
     ret = []
-    for each in steam_data['response']['games']:
-        appid = each['appid']
-        try:
-            game_instance = get_game_instance(appid)
-        except:
-            print("Unknown appid: {}".format(appid))
-            continue
-        ret.append(game_instance)
-
+    if steam_data:
+        for each in steam_data['response']['games']:
+            appid = each['appid']
+            try:
+                game_instance = get_game_instance(appid)
+            except:
+                print("Unknown appid: {}".format(appid))
+                continue
+            ret.append(game_instance)
+    else:
+        ret = []
     return ret
 
+
+def get_currencies_for_query(query):
+    currency_baseurl = "http://data.fixer.io/api/latest"
+    currency_key = secrets.currency_key
+    currency_format = '1'
+    symbols = query
+
+    currency_data = make_request_with_cache_currency(currency_baseurl, currency_key, symbols, currency_format)
+
+    return currency_data
+
+
+
+
+def save_games_to_db(games):
+    conn = sqlite3.connect('SteamAppPrice.db')
+    c = conn.cursor()
+
+    for i in range(len(games)):
+        c.execute('''INSERT OR IGNORE INTO APPS VALUES (?,?,?,?)''', [games[i].appid, games[i].name, games[i].price, games[i].currency])
+    conn.commit()
+    conn.close()
+    return
+
+
+def save_currencies_to_db(currency_data):
+    conn = sqlite3.connect('SteamAppPrice.db')
+    c = conn.cursor()
+
+    for key in currency_data['rates']:
+        c.execute('''INSERT OR IGNORE INTO CURRENCY VALUES (?,?)''', [key, currency_data['rates'][key]])
+    conn.commit()
+    conn.close()
+    return
 
 
 
 if __name__ == "__main__":
-    conn = sqlite3.connect('SteamAppPrice.db')
-    c = conn.cursor()
-
     CACHE_DICT = open_cache()
-    steam_baseurl = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/"
-    steam_key = '7F374A23BA3BD0391B8860562E98B9B9'
+    #steam_baseurl = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/"
+    #steam_key = '7F374A23BA3BD0391B8860562E98B9B9'
     steamid = '76561198439501171'
-    steam_format_data = 'json'
+#    steamid = '76561198369094342'
+ 
+    #steam_format_data = 'json'
 
     #steam_data = make_request_with_cache_steam(steam_baseurl, steam_key, steamid, steam_format_data)
     games = get_games_for_user(steamid)
 
-    for i in range(len(games)):
-        c.execute('''INSERT INTO APPS VALUES (?,?,?,?,?)''', [i, games[i].appid, games[i].name, games[i].price, games[i].currency])
+    save_games_to_db(games)
 
 
-    currency_baseurl = "http://data.fixer.io/api/latest"
-    currency_key = "9509f2d09e274f6442c08b2359883dde"
-    symbols = "USD,AUD,CAD,PLN,MXN"
-    currency_format = '1'
+    #currency_baseurl = "http://data.fixer.io/api/latest"
+    #currency_key = "9509f2d09e274f6442c08b2359883dde"
+#    symbols = "USD,AUD,CAD,PLN,MXN,CNY"
+    symbols = "USD,JPY,GBP,CNY,EUR,INR,AUD,CAD,MXN,PLN"
+    #currency_format = '1'
 
-    currency_data = make_request_with_cache_currency(currency_baseurl, currency_key, symbols, currency_format)
-
-    for key in currency_data['rates']:
-        c.execute('''INSERT INTO CURRENCY VALUES (?,?)''', [key, currency_data['rates'][key]])
-
-    conn.commit()
-
+    #currency_data = make_request_with_cache_currency(currency_baseurl, currency_key, symbols, currency_format)
+    currency_data = get_currencies_for_query(symbols)
+    save_currencies_to_db(currency_data)
 
     
 
