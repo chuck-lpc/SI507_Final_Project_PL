@@ -33,6 +33,7 @@
             <th>App Name</th>
             <th>Price</th>
             <th>Currency</th>
+            <th>Image</th>
         </tr>
         {% for row in games %}
         <tr>
@@ -40,6 +41,7 @@
             <td><a href='https://store.steampowered.com/app/{{row.appid}}'>{{row.name}}</a></td>
             <td>{{row.price}}</td>
             <td>{{row.currency}}</td>
+            <td><img src="{{row.img}}" alt="Image of {{row.name}}" width="230" height="107"></td>
         </tr>
         {% endfor %}
     </table>

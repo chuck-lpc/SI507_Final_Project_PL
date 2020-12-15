@@ -17,7 +17,8 @@ def initialize_db():
                 [NAME] text, 
                 [price] float, 
                 [currency] text, 
-                UNIQUE(appid, NAME, price, currency))''')
+                [img] text,
+                UNIQUE(appid, NAME, price, currency, img))''')
         c.execute('''CREATE TABLE CURRENCY
                 ([currency] text PRIMARY KEY, 
                 [price] float, 

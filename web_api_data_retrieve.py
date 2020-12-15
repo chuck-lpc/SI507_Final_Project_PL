@@ -183,11 +183,12 @@ def make_request_with_cache_currency(baseurl, access_key, symbols, data_format):
         return ret
 
 class Game:
-    def __init__(self, appid, name, price, currency):
+    def __init__(self, appid, name, price, currency, img):
         self.appid = appid
         self.name = name
         self.price = price
         self.currency = currency
+        self.img = img
 
 
 def get_soup_with_cache(url):
@@ -225,6 +226,7 @@ def get_game_instance(appid, region='us'):
     soup = get_soup_with_cache(game_url)
     
     name = soup.find('div', class_ = 'apphub_AppName').text.strip()
+    img = soup.find('img', class_ = "game_header_image_full")['src']
 
     #print(soup.find('div', class_ = 'game_purchase_price price'))
     try:
@@ -238,7 +240,7 @@ def get_game_instance(appid, region='us'):
 
 
 
-    ret = Game(appid, name, price, currency)
+    ret = Game(appid, name, price, currency, img)
 
     return ret
 
@@ -285,7 +287,7 @@ def save_games_to_db(games):
     c = conn.cursor()
 
     for i in range(len(games)):
-        c.execute('''INSERT OR IGNORE INTO APPS VALUES (?,?,?,?)''', [games[i].appid, games[i].name, games[i].price, games[i].currency])
+        c.execute('''INSERT OR IGNORE INTO APPS VALUES (?,?,?,?,?)''', [games[i].appid, games[i].name, games[i].price, games[i].currency, games[i].img])
     conn.commit()
     conn.close()
     return
